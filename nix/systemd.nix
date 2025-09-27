@@ -1,5 +1,5 @@
 { self, ...  }: {
-  nixosModules.default = { config, lib, ... }: 
+  nixosModules.default = { config, pkgs, lib, ... }: 
   let
     cfg = config.services.log-server;
   in with lib; {
@@ -48,7 +48,7 @@
         after = [ "network.target" ];
         wantedBy = [ "multi-user.target" ];
         serviceConfig = {
-          ExecStart = "${self.packages.${system}.default}/bin/log-server --host ${cfg.host} --port ${toString cfg.port} --jwt-secret ${cfg.jwt-secret} --jsonl-file ${cfg.jsonl-file}";
+          ExecStart = "${self.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/log-server --host ${cfg.host} --port ${toString cfg.port} --jwt-secret ${cfg.jwt-secret} --jsonl-file ${cfg.jsonl-file}";
           Restart = "on-failure";
           RestartSec = "5s";
         }; 
