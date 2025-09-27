@@ -60,7 +60,7 @@ def build_server(jwt_secret: str, log_file: str = "log.jsonl") -> FastAPI:
 
 def main():
     parser = argparse.ArgumentParser(description="Run the FastAPI server.")
-    parser.add_argument("-f", "--jsonl-file", type=str, help="Path to JSONL file for logging events", default=os.getenv("JSONL_FILE", "log.jsonl"))
+    parser.add_argument("-f", "--jsonl-file", type=str, help="Path to JSONL file for logging events", default=os.getenv("JSONL_FILE", "logs.jsonl"))
     parser.add_argument("-p", "--port", type=int, default=int(os.getenv("PORT", 8080)), help="Port to run the server on")
     parser.add_argument("--host", type=str, default="0.0.0.0", help="Host to run the server on")
     parser.add_argument("-r", "--reload", action="store_true", help="Enable auto-reload for development")
