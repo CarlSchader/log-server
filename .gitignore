@@ -209,3 +209,6 @@ __marimo__/
 
 # log files
 *.jsonl
+
+# nix
+result
