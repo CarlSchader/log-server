@@ -70,6 +70,17 @@ def main():
     if not args.jwt_secret:
         raise ValueError("JWT secret must be provided via --jwt-secret or JWT_SECRET environment variable")
 
+    # check if the log file exists and is writable
+    if not os.path.exists(args.jsonl_file):
+        os.makedirs(os.path.dirname(args.jsonl_file), exist_ok=True)
+        try:
+            with open(args.jsonl_file, "w"):
+                pass
+        except Exception as e:
+            raise ValueError(f"Cannot create log file at {args.jsonl_file}: {e}")
+    elif not os.access(args.jsonl_file, os.W_OK):
+        raise ValueError(f"Log file at {args.jsonl_file} is not writable")
+
     import uvicorn
     uvicorn.run(build_server(args.jwt_secret, args.jsonl_file), host=args.host, port=args.port, reload=args.reload)
 

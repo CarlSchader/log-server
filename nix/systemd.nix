@@ -48,6 +48,7 @@
         after = [ "network.target" ];
         wantedBy = [ "multi-user.target" ];
         serviceConfig = {
+          User = "root";
           ExecStart = "${self.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/log-server --host ${cfg.host} --port ${toString cfg.port} --jwt-secret ${cfg.jwt-secret} --jsonl-file ${cfg.jsonl-file}";
           Restart = "on-failure";
           RestartSec = "5s";
