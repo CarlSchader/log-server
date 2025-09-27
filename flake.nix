@@ -4,7 +4,7 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { nixpkgs, flake-utils, ...  }: 
+  outputs = { self, nixpkgs, flake-utils, ...  }: 
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
@@ -12,15 +12,21 @@
       {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            python312
+            uv
+            jwt-cli
           ];
 
           shellHook = ''
-            if [ ! -d .venv ]; then
-              python -m venv .venv
-            fi
-            source .venv/bin/activate
+            export JWT_SECRET=dev-secret
+            export JWT=$(jwt encode --secret $JWT_SECRET --alg HS256 --payload sub="carl")
           '';
+        };
+
+        nixosModules.default = { config, pkgs, ... }: 
+        let
+          cfg = config.services.log-server;
+        in {
+
         };
       }
     );
