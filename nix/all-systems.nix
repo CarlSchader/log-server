@@ -36,6 +36,14 @@
         shellHook = ''
           export JWT_SECRET=dev-secret
           export JWT=$(jwt encode --secret $JWT_SECRET --alg HS256 --payload sub="carl")
+
+          # check if .venv exists, if not create it
+          if [ ! -d .venv ]; then
+            uv venv --clear
+          fi
+
+          uv sync
+          source .venv/bin/activate
         '';
       };
 
