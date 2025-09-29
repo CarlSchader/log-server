@@ -64,15 +64,24 @@ def main():
     parser.add_argument("-p", "--port", type=int, default=int(os.getenv("PORT", 8080)), help="Port to run the server on")
     parser.add_argument("--host", type=str, default="0.0.0.0", help="Host to run the server on")
     parser.add_argument("-r", "--reload", action="store_true", help="Enable auto-reload for development")
-    parser.add_argument("--jwt-secret", type=str, help="JWT secret key for authentication", default=os.getenv("JWT_SECRET"))
+    parser.add_argument("-j", "--jwt-secret-file", type=str, help="path to file with JWT secret key for authentication", default=os.getenv("JWT_SECRET_PATH"))
     args = parser.parse_args()
 
-    if not args.jwt_secret:
-        raise ValueError("JWT secret must be provided via --jwt-secret or JWT_SECRET environment variable")
+    if not args.jwt_secret_file:
+        raise ValueError("JWT secret file path must be provided via --jwt-secret-file or JWT_SECRET environment variable")
+
+    if not os.path.exists(args.jwt_secret_file):
+        raise ValueError(f"JWT secret file not found at {args.jwt_secret_file}")
+
+    with open(args.jwt_secret_file, "r") as f:
+        jwt_secret = f.read().strip()
 
     # check if the log file exists and is writable
     if not os.path.exists(args.jsonl_file):
-        os.makedirs(os.path.dirname(args.jsonl_file), exist_ok=True)
+        file_dir = os.path.dirname(args.jsonl_file)
+
+        if file_dir and not os.path.exists(file_dir):
+            os.makedirs(os.path.dirname(args.jsonl_file), exist_ok=True)
         try:
             with open(args.jsonl_file, "w"):
                 pass
@@ -81,8 +90,9 @@ def main():
     elif not os.access(args.jsonl_file, os.W_OK):
         raise ValueError(f"Log file at {args.jsonl_file} is not writable")
 
+
     import uvicorn
-    uvicorn.run(build_server(args.jwt_secret, args.jsonl_file), host=args.host, port=args.port, reload=args.reload)
+    uvicorn.run(build_server(jwt_secret, args.jsonl_file), host=args.host, port=args.port, reload=args.reload)
 
 
 if __name__ == "__main__":
